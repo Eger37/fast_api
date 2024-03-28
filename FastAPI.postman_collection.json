@@ -1,0 +1,166 @@
+{
+	"info": {
+		"_postman_id": "ee16aa34-a428-403f-8558-18e8edf79281",
+		"name": "FastAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19263609"
+	},
+	"item": [
+		{
+			"name": "localhost:5000/signup",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"example6@example.com\",\r\n  \"password\": \"strongpassword\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/signup",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5000/add-post",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImV4YW1wbGU2QGV4YW1wbGUuY29tIn0.0AsQ0oSx6ywdM0inM5-cRpopMDgTcy-9KyNnWZLwc-I",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"text\": \"exampsdas\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/add-post",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"add-post"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5000/login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"example6@example.com\",\r\n  \"password\": \"strongpassword\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/login",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5000/get-posts",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImV4YW1wbGU2QGV4YW1wbGUuY29tIn0.0AsQ0oSx6ywdM0inM5-cRpopMDgTcy-9KyNnWZLwc-I",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/get-posts",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"get-posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5000/delete-post",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImV4YW1wbGU2QGV4YW1wbGUuY29tIn0.0AsQ0oSx6ywdM0inM5-cRpopMDgTcy-9KyNnWZLwc-I",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"post_id\":1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/delete-post",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"delete-post"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
