@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+    db:
+        image: mysql:latest
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: example_password
+            MYSQL_DATABASE: example_database
+            MYSQL_USER: example_user
+            MYSQL_PASSWORD: example_password
+        ports:
+            - '3306:3306'
+        volumes:
+            - mysql_data:/var/lib/mysql
+
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8080:8080
+
+    backend:
+        restart: always
+        tty: true
+        build:
+            context: ./backend
+        volumes:
+            - ./backend:/backend/app
+        working_dir: /backend/app
+        links:
+            - db
+        ports:
+            - '5000:5000'
+        environment:
+            - WATCHFILES_FORCE_POLLING=true
+volumes:
+    mysql_data:
