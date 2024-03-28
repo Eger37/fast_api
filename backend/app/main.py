@@ -1,11 +1,12 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.security import HTTPBearer
-from pydantic import BaseModel, constr, ValidationError
+from pydantic import BaseModel, constr
 from sqlalchemy.orm import Session
 from . import models, database
 from passlib.hash import bcrypt
 import jwt
 from jwt.exceptions import DecodeError
+from cachetools import TTLCache
 
 app = FastAPI()
 
@@ -15,6 +16,9 @@ SECRET_KEY = "secret_key"
 MAX_PAYLOAD_SIZE_MB = 1
 MAX_PAYLOAD_SIZE_BYTES = MAX_PAYLOAD_SIZE_MB * 1024 * 1024
 TextWithMaxLength = constr(max_length=MAX_PAYLOAD_SIZE_BYTES)
+
+# Cache for storing posts data
+posts_cache = TTLCache(maxsize=1000, ttl=300)  # Cache size is 1000, and TTL is 300 seconds (5 minutes)
 
 class UserCreate(BaseModel):
     email: str
@@ -48,7 +52,6 @@ def get_email_from_token(token: str):
         email = payload.get("email")
         return email
     except DecodeError:
-        print("her")
         return None
 
 @app.post("/signup")
@@ -111,7 +114,17 @@ def create_post_endpoint(post: Post, token: str = Depends(TokenAuth), db: Sessio
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-    return create_post(db, text=post.text, author_id=user.id)
+    # Check payload size
+    if len(post.text) > MAX_PAYLOAD_SIZE_BYTES:
+        raise HTTPException(status_code=400, detail="Payload size exceeds maximum limit")
+
+    # Create post
+    created_post = create_post(db, text=post.text, author_id=user.id)
+
+    # Remove posts cache
+    posts_cache.clear()
+
+    return created_post
 
 @app.get("/get-posts")
 def get_posts_endpoint(token: str = Depends(TokenAuth), db: Session = Depends(database.get_db)):
@@ -120,7 +133,17 @@ def get_posts_endpoint(token: str = Depends(TokenAuth), db: Session = Depends(da
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-    return get_posts_by_user(db, user.id)
+    # Check if posts data is cached
+    if user.email in posts_cache:
+        return posts_cache[user.email]
+
+    # Get posts from database
+    user_posts = get_posts_by_user(db, user.id)
+
+    # Cache posts data
+    posts_cache[user.email] = user_posts
+
+    return user_posts
 
 @app.delete("/delete-post")
 def delete_post_endpoint(post: PostDelete, token: str = Depends(TokenAuth), db: Session = Depends(database.get_db)):
@@ -129,13 +152,18 @@ def delete_post_endpoint(post: PostDelete, token: str = Depends(TokenAuth), db: 
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-    return delete_post(db, post.post_id, user.id)
+    # Delete post
+    deleted_post = delete_post(db, post.post_id, user.id)
+
+    # Remove posts cache
+    posts_cache.clear()
+
+    return deleted_post
 
 @app.get("/db_init")
 def db_init():
     database.Base.metadata.create_all(database.engine)
     return "good"
-
 
 @app.get("/")
 def read_root():
