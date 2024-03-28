@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.security import HTTPBearer
-from pydantic import BaseModel
+from pydantic import BaseModel, constr, ValidationError
 from sqlalchemy.orm import Session
 from . import models, database
 from passlib.hash import bcrypt
@@ -10,6 +10,11 @@ from jwt.exceptions import DecodeError
 app = FastAPI()
 
 SECRET_KEY = "secret_key"
+
+# Define a constraint for the maximum payload size
+MAX_PAYLOAD_SIZE_MB = 1
+MAX_PAYLOAD_SIZE_BYTES = MAX_PAYLOAD_SIZE_MB * 1024 * 1024
+TextWithMaxLength = constr(max_length=MAX_PAYLOAD_SIZE_BYTES)
 
 class UserCreate(BaseModel):
     email: str
@@ -69,7 +74,7 @@ def login(user: UserLogin, db: Session = Depends(database.get_db)):
 
 # Post views
 class Post(BaseModel):
-    text: str
+    text: TextWithMaxLength
 
 class PostDelete(BaseModel):
     post_id: int
